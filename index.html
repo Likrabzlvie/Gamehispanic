@@ -1994,6 +1994,7 @@ function scheduleKill(player,idx,name, killerP){
 
     // 🛑 SI LA PARTIE EST FINIE, ON ARRÊTE TOUT ICI ! PAS DE BUTIN, PAS D'ATTENTE !
     if (a1 === 0 || a2 === 0) {
+      checkWin(); // 🏆 FORCE LA DÉTECTION DE LA VICTOIRE IMMÉDIATE
       return; 
     }
     
@@ -2224,9 +2225,19 @@ function stopMarquezEvent() {
   }
 }
 
+function checkWin(){
+  const a1=gs.cards[1].filter(c=>c&&c.hp>0).length;
+  const a2=gs.cards[2].filter(c=>c&&c.hp>0).length;
+  if(a1===0||a2===0){
+    gs.gameOver=true;
+    const winner=a1>0?'🛡 EQUIPO 1':'⚔ EQUIPO 2';
+    setTimeout(()=>showWin(winner),900);
+  }
+}
+
 function showWin(winner){
   const ov=document.getElementById('overlay');
-  ov.innerHTML=`<div class="overlay-title">⚜ VICTORIA ⚜</div><div class="overlay-sub" style="font-size:26px;color:#f0c040;">${winner} TRIUNFA</div><button class="big-btn" onclick="location.reload()">⚔ Nueva Partida</button>`;
+  ov.innerHTML=`<div class="overlay-title"><svg class="icon"><use href="#icon-fleur-de-lis"></use></svg> VICTORIA <svg class="icon"><use href="#icon-fleur-de-lis"></use></svg></div><div class="overlay-sub" style="font-size:26px;color:#f0c040;">${winner} TRIUNFA</div><button class="big-btn" onclick="location.reload()"><svg class="icon icon-stroke"><use href="#icon-sword"></use></svg> Nueva Partida <svg class="icon icon-stroke"><use href="#icon-sword"></use></svg></button>`;
   ov.style.display='flex';
 }
 
