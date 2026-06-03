@@ -2237,10 +2237,19 @@ function checkWin(){
 
 function showWin(winner){
   const ov=document.getElementById('overlay');
-  ov.innerHTML=`<div class="overlay-title"><svg class="icon"><use href="#icon-fleur-de-lis"></use></svg> VICTORIA <svg class="icon"><use href="#icon-fleur-de-lis"></use></svg></div><div class="overlay-sub" style="font-size:26px;color:#f0c040;">${winner} TRIUNFA</div><button class="big-btn" onclick="location.reload()"><svg class="icon icon-stroke"><use href="#icon-sword"></use></svg> Nueva Partida <svg class="icon icon-stroke"><use href="#icon-sword"></use></svg></button>`;
+  ov.style.zIndex = '50000'; /* 👑 Force l'écran de victoire AU-DESSUS de tout le reste ! */
+  
+  ov.innerHTML=`
+    <div class="overlay-title"><svg class="icon"><use href="#icon-trophy"></use></svg> VICTORIA <svg class="icon"><use href="#icon-trophy"></use></svg></div>
+    <div class="overlay-sub" style="font-size:32px; color:#f0c040; margin-bottom: 20px;">¡${winner} TRIUNFA!</div>
+    <button class="big-btn" onclick="location.reload()">
+      <svg class="icon icon-stroke"><use href="#icon-arrow-left"></use></svg> Volver al Menú Principal
+    </button>
+  `;
   ov.style.display='flex';
+  playSound('sfx-reveal'); // Petit son stylé pour marquer la victoire
 }
-
+  
 function showTurnBanner(){
   const b=document.getElementById('turn-banner');
   b.textContent=`JUGADOR ${gs.currentPlayer}`;
