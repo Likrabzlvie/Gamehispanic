@@ -952,13 +952,8 @@ function preparerEcoute() {
       gs.cards[donnees.player].push(donnees.card); 
       renderAll();
     }
-    else if (donnees.type === 'LOOT') {
-      setTimeout(() => {
-        gs.conquistadors[donnees.player].push(donnees.conq);
-        log(`El enemigo ha conseguido un Artefacto: ${donnees.conq.name}`);
-        gs.isLooting = false; // 🟢 Retire le feu rouge pour l'adversaire afin que Márquez puisse s'activer si besoin
-        renderAll();
-      }, 1000);
+    else if (donnees.type === 'LOOT') setTimeout(() => showLootModal(donnees.conq, donnees.player), 1000); 
+  });
 }
 // ==========================================
 /* ═════════════════ GESTION DE LA MUSIQUE ET SOURIS ═════════════════ */
@@ -1697,9 +1692,17 @@ function showLootModal(conq, player){
   const modal = document.getElementById('pioche-modal');
   modal.classList.add('active');
   
-  modal.style.transform = 'none';
-  document.getElementById('pioche-sub').textContent = '¡El botín de guerra es tuyo!';
+  // Tourner la fenêtre si c'est l'ennemi qui a gagné
+  if (player !== myPlayerId) {
+    modal.style.transform = 'rotate(180deg)';
+    document.getElementById('pioche-sub').textContent = 'El enemigo ha conseguido un Artefacto...';
+  } else {
+    modal.style.transform = 'none';
+    document.getElementById('pioche-sub').textContent = '¡El botín de guerra es tuyo!';
+  }
+
   document.getElementById('pioche-title').textContent = '✦ ¡NUEVO CONQUISTADOR! ✦';
+
   const reveal = document.getElementById('pioche-reveal');
   reveal.innerHTML = '';
   const wrap = document.createElement('div');
@@ -1991,7 +1994,6 @@ function scheduleKill(player,idx,name, killerP){
 
     // 🛑 SI LA PARTIE EST FINIE, ON ARRÊTE TOUT ICI ! PAS DE BUTIN, PAS D'ATTENTE !
     if (a1 === 0 || a2 === 0) {
-      checkWin(); // 🏆 FORCE LA DÉTECTION DE LA VICTOIRE IMMÉDIATE
       return; 
     }
     
@@ -2222,31 +2224,12 @@ function stopMarquezEvent() {
   }
 }
 
-function checkWin(){
-  const a1=gs.cards[1].filter(c=>c&&c.hp>0).length;
-  const a2=gs.cards[2].filter(c=>c&&c.hp>0).length;
-  if(a1===0||a2===0){
-    gs.gameOver=true;
-    const winner=a1>0?'🛡 EQUIPO 1':'⚔ EQUIPO 2';
-    setTimeout(()=>showWin(winner),900);
-  }
-}
-
 function showWin(winner){
   const ov=document.getElementById('overlay');
-  ov.style.zIndex = '50000'; /* 👑 Force l'écran de victoire AU-DESSUS de tout le reste ! */
-  
-  ov.innerHTML=`
-    <div class="overlay-title"><svg class="icon"><use href="#icon-trophy"></use></svg> VICTORIA <svg class="icon"><use href="#icon-trophy"></use></svg></div>
-    <div class="overlay-sub" style="font-size:32px; color:#f0c040; margin-bottom: 20px;">¡${winner} TRIUNFA!</div>
-    <button class="big-btn" onclick="location.reload()">
-      <svg class="icon icon-stroke"><use href="#icon-arrow-left"></use></svg> Volver al Menú Principal
-    </button>
-  `;
+  ov.innerHTML=`<div class="overlay-title">⚜ VICTORIA ⚜</div><div class="overlay-sub" style="font-size:26px;color:#f0c040;">${winner} TRIUNFA</div><button class="big-btn" onclick="location.reload()">⚔ Nueva Partida</button>`;
   ov.style.display='flex';
-  playSound('sfx-reveal'); // Petit son stylé pour marquer la victoire
 }
-  
+
 function showTurnBanner(){
   const b=document.getElementById('turn-banner');
   b.textContent=`JUGADOR ${gs.currentPlayer}`;
