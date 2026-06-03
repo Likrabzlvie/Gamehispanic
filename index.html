@@ -952,8 +952,13 @@ function preparerEcoute() {
       gs.cards[donnees.player].push(donnees.card); 
       renderAll();
     }
-    else if (donnees.type === 'LOOT') setTimeout(() => showLootModal(donnees.conq, donnees.player), 1000); 
-  });
+    else if (donnees.type === 'LOOT') {
+      setTimeout(() => {
+        gs.conquistadors[donnees.player].push(donnees.conq);
+        log(`El enemigo ha conseguido un Artefacto: ${donnees.conq.name}`);
+        gs.isLooting = false; // 🟢 Retire le feu rouge pour l'adversaire afin que Márquez puisse s'activer si besoin
+        renderAll();
+      }, 1000);
 }
 // ==========================================
 /* ═════════════════ GESTION DE LA MUSIQUE ET SOURIS ═════════════════ */
@@ -1692,17 +1697,9 @@ function showLootModal(conq, player){
   const modal = document.getElementById('pioche-modal');
   modal.classList.add('active');
   
-  // Tourner la fenêtre si c'est l'ennemi qui a gagné
-  if (player !== myPlayerId) {
-    modal.style.transform = 'rotate(180deg)';
-    document.getElementById('pioche-sub').textContent = 'El enemigo ha conseguido un Artefacto...';
-  } else {
-    modal.style.transform = 'none';
-    document.getElementById('pioche-sub').textContent = '¡El botín de guerra es tuyo!';
-  }
-
+  modal.style.transform = 'none';
+  document.getElementById('pioche-sub').textContent = '¡El botín de guerra es tuyo!';
   document.getElementById('pioche-title').textContent = '✦ ¡NUEVO CONQUISTADOR! ✦';
-
   const reveal = document.getElementById('pioche-reveal');
   reveal.innerHTML = '';
   const wrap = document.createElement('div');
