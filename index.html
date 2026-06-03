@@ -1223,10 +1223,12 @@ BESTIARY.forEach(card => {
 
 /* ═════════════════ GESTION DES BRUITAGES (SFX) ═════════════════ */
 function playSound(id) {
-  const sound = document.getElementById(id);
-  if (sound) {
-    sound.currentTime = 0; // Remet le son à zéro pour pouvoir le jouer en rafale
-    sound.play().catch(e => console.log("Son bloqué par le navegador", e));
+  const original = document.getElementById(id);
+  if (original) {
+    // On clone le son pour qu'il puisse se jouer plusieurs fois en même temps sans bug sur iOS
+    const clone = original.cloneNode();
+    clone.volume = original.volume || 1;
+    clone.play().catch(e => console.log("Son bloqué par le navigateur :", e));
   }
 }
 
@@ -1989,6 +1991,11 @@ function scheduleKill(player,idx,name, killerP){
     // On vérifie combien de bêtes sont encore en vie maintenant
     const a1 = gs.cards[1].filter(c => c && c.hp > 0).length;
     const a2 = gs.cards[2].filter(c => c && c.hp > 0).length;
+
+    // 🛑 SI LA PARTIE EST FINIE, ON ARRÊTE TOUT ICI ! PAS DE BUTIN, PAS D'ATTENTE !
+    if (a1 === 0 || a2 === 0) {
+      return; 
+    }
     
     // 💰 SYSTÈME DE LOOT NORMAL
     const pris = [...gs.conquistadors[1], ...gs.conquistadors[2]].map(c => c.id);
